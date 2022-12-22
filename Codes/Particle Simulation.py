@@ -232,7 +232,7 @@ scal=4 # axis scaling factor (can be changed for visuals)
 xbase=100e6
 ybase=56e6
 
-# !!! which slice (i.e. xy, xz planes) !!!
+# !!! determines the 2D slice (i.e. xy, xz planes) !!!
 slicee={
         12:'',
         1:'$x(t)$',
