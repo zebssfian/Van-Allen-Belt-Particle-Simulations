@@ -2,6 +2,8 @@
 
 Numerical simulations of charged particle motion in the Van Allen radiation belts under the influence of Earth's magnetic field, with visualizations of the results.
 
+This project was motivated by an E&M video project on the topic; the animation style is relatively original and can be reused for other kinds of particle simulations if desired.
+
 ## Authors
 
 - [@zebssfian](https://github.com/zebssfian)
