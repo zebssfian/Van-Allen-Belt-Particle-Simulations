@@ -17,7 +17,7 @@ c = 299792458   # meters per second (speed of light)
 B0 = 3.12E-5    # Tesla (mean value of the magnetic field at the magnetic equator on the Earth's surface)
 RE = 6.278e6    # meters (radius of the Earth)
 
-# --- numerical integration --- #
+# --- numerical integration function --- #
 '''
 This is our numerical integrator. It goes from 't=0' to 't=tmax,'
     with time steps of size 'eps.' It returns a list of the particle's 
@@ -28,19 +28,19 @@ The code will evaluate the motion of protons by default.
     you can simply alter the input for 'q' and 'm' below.
 '''
 def igr(tmax, eps, x0=5, y0=5, z0=5, xd0=1, yd0=1, zd0=1, q=qe, m=m_p):
-    # --- set initial time and the list that will keep track of t --- #
+    # defining initial time t, and defining a list to keep track of t
     t = 0
     t_sav = []
 
-    # --- Now comes the actual integration setup, --- #
-    # --- defining x,y,z (position) --- #
+    # defining initial positions x, y, and z; and defining a list to keep track of x, y, and z
     x = x0*RE
     y = y0*RE
     z = z0*RE
     x_sav = []
     y_sav = []
     z_sav = []
-    # --- and xd,yd,zd (velocity) --- #
+
+    # defining initial velocities xd, yd, and zd; and defining a list to keep track of xd, yd, and zd
     xd = xd0*RE
     yd = yd0*RE
     zd = zd0*RE
@@ -48,82 +48,83 @@ def igr(tmax, eps, x0=5, y0=5, z0=5, xd0=1, yd0=1, zd0=1, q=qe, m=m_p):
     yd_sav = []
     zd_sav = []
 
-    # --- function for calculating the radial magnitude, to be used in computing the magnetic field--- #
+    # calculating the radial magnitude, used in computing the magnetic field
     def r(x,y,z):
         return np.sqrt(x**2 + y**2 + z**2)
-    # --- functions to compute the magnetic field strength at a point (x,y,z) --- #
+    
+    # computing Earth's magnetic field strength at a point (x,y,z)
     def Bx(x,y,z):
-        return -3 * B0 * (RE / r(x,y,z))**3 * x*z/r(x,y,z)**2
+        return -3 * B0 * (RE / r(x,y,z))**3 * x*z / r(x,y,z)**2
     def By(x,y,z):
-        return -3 * B0 * (RE / r(x,y,z))**3 * y*z/r(x,y,z)**2
+        return -3 * B0 * (RE / r(x,y,z))**3 * y*z / r(x,y,z)**2
     def Bz(x,y,z):
-        return B0 * (RE / r(x,y,z))**3 * (x**2+y**2-2*z**2) / r(x,y,z)**2
+        return B0 * (RE / r(x,y,z))**3 * (x**2 + y**2 - 2*z**2) / r(x,y,z)**2
     
     # --- RK4 numerical integration implementation --- #
     while t <= tmax:
-        # --- time step --- #
+        # time step
         t = t + eps
         t_sav.append(t)
         
-        # --- we split into 4 steps for each time interval for the RK4 method; --- #
+        # to implement RK4, we must split each time interval into 4 steps:
         
-        # step 1 #
+        # step 1
         x1 = x
         y1 = y
         z1 = z
         xd1 = xd
         yd1 = yd
         zd1 = zd
-        gammainv=np.sqrt(1 - min(1,(xd1**2 + yd1**2 + zd1**2) / c**2))
+        gammainv=np.sqrt(1 - min(1, (xd1**2 + yd1**2 + zd1**2) / c**2)) # inverse Lorentz factor to account for special relativity
         xdd1 = gammainv * (yd1 * Bz(x1,y1,z1) - zd1 * By(x1,y1,z1))
         ydd1 = gammainv * (zd1 * Bx(x1,y1,z1) - xd1 * Bz(x1,y1,z1))
         zdd1 = gammainv * (xd1 * By(x1,y1,z1) - yd1 * Bx(x1,y1,z1))
         
-        # step 2 #
-        x2 = x+0.5*xd1*eps
-        y2 = y+0.5*yd1*eps
-        z2 = z+0.5*zd1*eps
-        xd2 = xd+0.5*(q/m)*xdd1*eps
-        yd2 = yd+0.5*(q/m)*ydd1*eps
-        zd2 = zd+0.5*(q/m)*zdd1*eps
-        gammainv=np.sqrt(1 - min(1,(xd2**2 + yd2**2 + zd2**2) / c**2))
+        # step 2
+        x2 = x + 0.5 * xd1 * eps
+        y2 = y + 0.5 * yd1 * eps
+        z2 = z + 0.5 * zd1 * eps
+        xd2 = xd + 0.5 * (q / m) * xdd1 * eps
+        yd2 = yd + 0.5 * (q / m) * ydd1 * eps
+        zd2 = zd + 0.5 * (q / m) * zdd1 * eps
+        gammainv = np.sqrt(1 - min(1, (xd2**2 + yd2**2 + zd2**2) / c**2)) # inverse Lorentz factor to account for special relativity
         xdd2 = gammainv * (yd2 * Bz(x2,y2,z2) - zd2 * By(x2,y2,z2))
         ydd2 = gammainv * (zd2 * Bx(x2,y2,z2) - xd2 * Bz(x2,y2,z2))
         zdd2 = gammainv * (xd2 * By(x2,y2,z2) - yd2 * Bx(x2,y2,z2))
         
-        # step 3 #
-        x3 = x+0.5*xd2*eps
-        y3 = y+0.5*yd2*eps
-        z3 = z+0.5*zd2*eps
-        xd3 = xd+0.5*(q/m)*xdd2*eps
-        yd3 = yd+0.5*(q/m)*ydd2*eps
-        zd3 = zd+0.5*(q/m)*zdd2*eps
-        gammainv=np.sqrt(1 - min(1,(xd3**2 + yd3**2 + zd3**2) / c**2))
+        # step 3
+        x3 = x + 0.5 * xd2 * eps
+        y3 = y + 0.5 * yd2 * eps
+        z3 = z + 0.5 * zd2 * eps
+        xd3 = xd + 0.5 * (q / m) * xdd2 * eps
+        yd3 = yd + 0.5 * (q / m) * ydd2 * eps
+        zd3 = zd + 0.5 * (q / m) * zdd2 * eps
+        gammainv = np.sqrt(1 - min(1, (xd3**2 + yd3**2 + zd3**2) / c**2)) # inverse Lorentz factor to account for special relativity
         xdd3 = gammainv * (yd3 * Bz(x3,y3,z3) - zd3 * By(x3,y3,z3))
         ydd3 = gammainv * (zd3 * Bx(x3,y3,z3) - xd3 * Bz(x3,y3,z3))
         zdd3 = gammainv * (xd3 * By(x3,y3,z3) - yd3 * Bx(x3,y3,z3))
         
-        # step 4 #
-        x4 = x+xd3*eps
-        y4 = y+yd3*eps
-        z4 = z+zd3*eps
-        xd4 = xd+(q/m)*xdd3*eps
-        yd4 = yd+(q/m)*ydd3*eps
-        zd4 = zd+(q/m)*zdd3*eps
-        gammainv=np.sqrt(1 - min(1,(xd4**2 + yd4**2 + zd4**2) / c**2))
+        # step 4
+        x4 = x + xd3 * eps
+        y4 = y + yd3 * eps
+        z4 = z + zd3 * eps
+        xd4 = xd + (q / m) * xdd3 * eps
+        yd4 = yd + (q / m) * ydd3 * eps
+        zd4 = zd + (q / m) * zdd3 * eps
+        gammainv = np.sqrt(1 - min(1, (xd4**2 + yd4**2 + zd4**2) / c**2)) # inverse Lorentz factor to account for special relativity
         xdd4 = gammainv * (yd4 * Bz(x4,y4,z4) - zd4 * By(x4,y4,z4))
         ydd4 = gammainv * (zd4 * Bx(x4,y4,z4) - xd4 * Bz(x4,y4,z4))
         zdd4 = gammainv * (xd4 * By(x4,y4,z4) - yd4 * Bx(x4,y4,z4))
         
-        # step final; averaging the above steps #
-        x = x+(eps/6)*(xd1+2*xd2+2*xd3+xd4)
-        y = y+(eps/6)*(yd1+2*yd2+2*yd3+yd4)
-        z = z+(eps/6)*(zd1+2*zd2+2*zd3+zd4)
-        xd = xd+(q/m)*(eps/6)*(xdd1+2*xdd2+2*xdd3+xdd4)
-        yd = yd+(q/m)*(eps/6)*(ydd1+2*ydd2+2*ydd3+ydd4)
-        zd = zd+(q/m)*(eps/6)*(zdd1+2*zdd2+2*zdd3+zdd4)
+        # final step: averaging the above steps
+        x = x + (eps/6) * (xd1 + 2*xd2 + 2*xd3 + xd4)
+        y = y + (eps/6) * (yd1 + 2*yd2 + 2*yd3 + yd4)
+        z = z + (eps/6) * (zd1 + 2*zd2 + 2*zd3 + zd4)
+        xd = xd + (q/m) * (eps/6) * (xdd1 + 2*xdd2 + 2*xdd3 + xdd4)
+        yd = yd + (q/m) * (eps/6) * (ydd1 + 2*ydd2 + 2*ydd3 + ydd4)
+        zd = zd + (q/m) * (eps/6) * (zdd1 + 2*zdd2 + 2*zdd3 + zdd4)
         
-        # --- Save all values to prepare for next time step --- #
+        # saving all the above values for the next time step
         x_sav.append(x)
         y_sav.append(y)
         z_sav.append(z)
@@ -131,79 +132,88 @@ def igr(tmax, eps, x0=5, y0=5, z0=5, xd0=1, yd0=1, zd0=1, q=qe, m=m_p):
         yd_sav.append(yd)
         zd_sav.append(zd)
     
-    # spit out the result of the integration #
+    # returning the integration results as lists
     return t_sav, x_sav, y_sav, z_sav
 
-# --- We here define what the integration step and final time should be --- #
+# --- defining the integration step and the final time --- #
 eps = 0.01
 tmax = 500 # basically in seconds, given the SI units
 
-# --- perform the integration and get results for plotting --- #
-# below follow a whole buch of test cases for our simulation #
+# --- test cases below --- #
+
+#two particles with proton mass and opposite elementary charge:
 '''
-#twoparticle opposite charge
 t_sav, x_sav, y_sav, z_sav = igr(tmax,eps,x0=5,y0=5,z0=5,xd0=-1,yd0=-1,zd0=-1,q=qe,m=m_p)
 t2_sav, x2_sav, y2_sav, z2_sav = igr(tmax,eps,x0=5,y0=5,z0=5,xd0=-1,yd0=-1,zd0=-1,q=-qe,m=m_p)
 '''
+
+#two protons symmetric about the z-axis:
 '''
-#twoproton symmetric about z
 t_sav, x_sav, y_sav, z_sav = igr(tmax,eps,x0=5,y0=5,z0=5,xd0=-1,yd0=-1,zd0=-1,q=qe,m=m_p)
 t2_sav, x2_sav, y2_sav, z2_sav = igr(tmax,eps,x0=-5,y0=-5,z0=5,xd0=1,yd0=1,zd0=-1,q=qe,m=m_p)
 '''
+
+# four protons being trapped in the radiation belt:
 '''
-#4proton trapping
 t_sav, x_sav, y_sav, z_sav = igr(tmax,eps,x0=10,y0=5,z0=5,xd0=-1,yd0=-1,zd0=-1,q=qe,m=m_p)
 t2_sav, x2_sav, y2_sav, z2_sav = igr(tmax,eps,x0=10,y0=5,z0=4,xd0=-1,yd0=-1,zd0=-1,q=qe,m=m_p)
 t3_sav, x3_sav, y3_sav, z3_sav = igr(tmax,eps,x0=10,y0=5,z0=3,xd0=-1,yd0=-1,zd0=-1,q=qe,m=m_p)
 t4_sav, x4_sav, y4_sav, z4_sav = igr(tmax,eps,x0=10,y0=5,z0=2,xd0=-1,yd0=-1,zd0=-1,q=qe,m=m_p)
 '''
+
+# four protons with differing energies:
 '''
-#different energy protons
 t_sav, x_sav, y_sav, z_sav = igr(tmax,eps,x0=10,y0=5,z0=5,xd0=-1,yd0=-1,zd0=-1,q=qe,m=m_p)
 t2_sav, x2_sav, y2_sav, z2_sav = igr(tmax,eps,x0=10,y0=5,z0=4,xd0=-2,yd0=-1,zd0=-1,q=qe,m=m_p)
 t3_sav, x3_sav, y3_sav, z3_sav = igr(tmax,eps,x0=10,y0=5,z0=3,xd0=-3,yd0=-1,zd0=-1,q=qe,m=m_p)
 t4_sav, x4_sav, y4_sav, z4_sav = igr(tmax,eps,x0=10,y0=5,z0=2,xd0=-4,yd0=-1,zd0=-1,q=qe,m=m_p)
 '''
+
+# four electrons exhibiting relativistic whizzing:
 '''
-#electron 4 relativistic whizzing
 t_sav, x_sav, y_sav, z_sav = igr(tmax,eps,x0=40,y0=5,z0=10,xd0=-1,yd0=-0,zd0=-0.01,q=-qe,m=m_e)
 t2_sav, x2_sav, y2_sav, z2_sav = igr(tmax,eps,x0=40,y0=5,z0=5,xd0=-10,yd0=-0,zd0=-0.01,q=-qe,m=m_e)
 t3_sav, x3_sav, y3_sav, z3_sav = igr(tmax,eps,x0=40,y0=5,z0=-5,xd0=-1,yd0=-0,zd0=-0.01,q=-qe,m=m_e)
 t4_sav, x4_sav, y4_sav, z4_sav = igr(tmax,eps,x0=40,y0=5,z0=-10,xd0=-10,yd0=-0,zd0=-0.01,q=-qe,m=m_e)
 '''
+
+# four initially stuck electrons which later escape (requires tmax > 400, v = 40, scal = 5, frames > 200):
 '''
-#electron stuck until not, requires tmax>400,v=40,scal=5, frames>200
 t_sav, x_sav, y_sav, z_sav = igr(tmax,eps,x0=40,y0=0,z0=10,xd0=-1,yd0=-0.1,zd0=-1,q=-qe,m=m_e)
 t2_sav, x2_sav, y2_sav, z2_sav = igr(tmax,eps,x0=-50,y0=0,z0=5,xd0=1,yd0=-0.1,zd0=-1,q=-qe,m=m_e)
 t3_sav, x3_sav, y3_sav, z3_sav = igr(tmax,eps,x0=50,y0=0,z0=-5,xd0=-1,yd0=-0.1,zd0=1,q=-qe,m=m_e)
 t4_sav, x4_sav, y4_sav, z4_sav = igr(tmax,eps,x0=-50,y0=0,z0=-10,xd0=1,yd0=-0.1,zd0=1,q=-qe,m=m_e)
 '''
+
+# four stuck electrons with nice gyration (requires tmax > 400, v = 1, scal = 4, frames > 500):
 '''
-#electron probably stuck with nice gyration? requires tmax>400,v=1,scal=4, frames>500
 t_sav, x_sav, y_sav, z_sav = igr(tmax,eps,x0=40,y0=0,z0=10,xd0=-20,yd0=-1,zd0=-1,q=-qe,m=m_e)
 t2_sav, x2_sav, y2_sav, z2_sav = igr(tmax,eps,x0=-50,y0=0,z0=5,xd0=20,yd0=-1,zd0=-1,q=-qe,m=m_e)
 t3_sav, x3_sav, y3_sav, z3_sav = igr(tmax,eps,x0=50,y0=0,z0=-5,xd0=-20,yd0=-1,zd0=1,q=-qe,m=m_e)
 t4_sav, x4_sav, y4_sav, z4_sav = igr(tmax,eps,x0=-50,y0=0,z0=-10,xd0=20,yd0=-1,zd0=1,q=-qe,m=m_e)
 '''
 
-#electron proton *jingle jingle* tooooo-gether again, badum badum...
+# electron-proton *jingle jingle* tooooo-gether again, badum badum...:
 t_sav, x_sav, y_sav, z_sav = igr(tmax,eps,x0=-6,y0=-6,z0=-6,xd0=-1,yd0=-1,zd0=-1,q=qe,m=m_p)
 t2_sav, x2_sav, y2_sav, z2_sav = igr(tmax,eps,x0=-50,y0=1,z0=-10,xd0=20,yd0=-5,zd0=1,q=-qe,m=m_e)
 
+# proton leaving the chat:
 '''
-#proton leaving the chat
 t_sav, x_sav, y_sav, z_sav = igr(tmax,eps,x0=-5,y0=-5,z0=-5,xd0=5,yd0=5,zd0=5,q=qe,m=m_p)
 '''
+
+#proton leaving the chat but more slowly:
 '''
-#single proton stays
-t_sav, x_sav, y_sav, z_sav = igr(tmax,eps,x0=5,y0=5,z0=5,xd0=1,yd0=1,zd0=1,q=qe,m=m_p)
-'''
-'''
-#proton still leaving the chat but more slowly
 t_sav, x_sav, y_sav, z_sav = igr(tmax,eps,x0=-10,y0=-10,z0=-10,xd0=2,yd0=2,zd0=2,q=qe,m=m_p)
 '''
+
+#single proton staying:
 '''
-#bunch of particles
+t_sav, x_sav, y_sav, z_sav = igr(tmax,eps,x0=5,y0=5,z0=5,xd0=1,yd0=1,zd0=1,q=qe,m=m_p)
+'''
+
+# string octet:
+'''
 t_sav, x_sav, y_sav, z_sav = igr(tmax,eps,x0=-35,y0=0,z0=10,xd0=15,yd0=-1,zd0=-1,q=-qe,m=m_e)
 t2_sav, x2_sav, y2_sav, z2_sav = igr(tmax,eps,x0=-40,y0=0,z0=5,xd0=20,yd0=-1,zd0=-1,q=-qe,m=m_e)
 t3_sav, x3_sav, y3_sav, z3_sav = igr(tmax,eps,x0=-45,y0=0,z0=-5,xd0=25,yd0=-1,zd0=1,q=-qe,m=m_e)
@@ -214,15 +224,15 @@ t7_sav, x7_sav, y7_sav, z7_sav = igr(tmax,eps,x0=-10,y0=0,z0=-7,xd0=3,yd0=-1,zd0
 t8_sav, x8_sav, y8_sav, z8_sav = igr(tmax,eps,x0=-10,y0=0,z0=-4,xd0=4,yd0=-1,zd0=1,q=qe,m=m_p)
 '''
 
-# --- relative speed of animation --- #
-v=3     # basically tells how many time steps per frame
-# --- axis scaling factor (can be changed for visuals) --- #
-scal=4
-# --- base aspect ratio setting --- #
+# --- animation --- #
+v =3 # relative animation speed (basically the number of time steps per frame)
+scal=4 # axis scaling factor (can be changed for visuals)
+
+# base aspect ratio setting
 xbase=100e6
 ybase=56e6
 
-# !!! which slice (i.e. xy, xz planes) !!! #
+# !!! which slice (i.e. xy, xz planes) !!!
 slicee={
         12:'',
         1:'$x(t)$',
@@ -262,7 +272,7 @@ def makeBack():
     # same limits for consistency #
     ax.set_xlim(xmin=-scal*xbase,xmax=scal*xbase)
     ax.set_ylim(ymin=-scal*ybase,ymax=scal*ybase)
-    plt.savefig('C:\\Users\\renli\\OneDrive - McGill University\\Assignments\\Fall 2022\\Phys 350\\Project\\dark-Bfield-background.png',bbox_inches='tight',dpi=300,pad_inches=0.0)
+    plt.savefig('C:\\Users\\???\\OneDrive - McGill University\\Assignments\\Fall 2022\\Phys 350\\Project\\dark-Bfield-background.png',bbox_inches='tight',dpi=300,pad_inches=0.0)
     plt.axis('on')  # we don't want plt to be changed forever, only here no axes
 
 # --- run that ^ function once --- #
@@ -278,7 +288,7 @@ plt.style.use('dark_background')
 # --- create axes --- #
 ax = fig.add_subplot(1,1,1) # add and label the relevant figure subplot
 # --- get magnetic field background image, will automatically change between xz, xy, yz according to what we did above --- #
-background_field = plt.imread('C:\\Users\\renli\\OneDrive - McGill University\\Assignments\\Fall 2022\\Phys 350\\Project\\dark-Bfield-background'+slicee[12]+'.png')
+background_field = plt.imread('C:\\Users\\???\\OneDrive - McGill University\\Assignments\\Fall 2022\\Phys 350\\Project\\dark-Bfield-background'+slicee[12]+'.png')
 
 # --- the animation function (creates the frames) --- #
 def animate(j):
@@ -315,7 +325,7 @@ def animate(j):
 animation_1 = animation.FuncAnimation(fig,animate,frames=2000,interval=33)
 plt.show()
 # !!! save the animation !!! #
-animation_1.save("C:\\Users\\renli\\OneDrive - McGill University\\Assignments\\Fall 2022\\Phys 350\\Project\\animation gifs\\particle_motion-proton-electron-together-xz(timed).mp4",dpi=300)
+animation_1.save("C:\\Users\\???\\OneDrive - McGill University\\Assignments\\Fall 2022\\Phys 350\\Project\\animation gifs\\particle_motion-proton-electron-together-xz(timed).mp4",dpi=300)
 
 
 # trace plotting for the full motion #
@@ -325,7 +335,7 @@ def plotFullTrace(u,v,t):
     plt.style.use('dark_background')
     ax = fig.add_subplot(1,1,1)
     # --- get magnetic field background image, to change between xz, xy, yz --- #
-    background_field = plt.imread('C:\\Users\\renli\\OneDrive - McGill University\\Assignments\\Fall 2022\\Phys 350\\Project\\dark-Bfield-background'+slicee[12]+'.png')
+    background_field = plt.imread('C:\\Users\\???\\OneDrive - McGill University\\Assignments\\Fall 2022\\Phys 350\\Project\\dark-Bfield-background'+slicee[12]+'.png')
     # --- set the background of the plot --- #
     ax.imshow(background_field, extent=[-scal*xbase,scal*xbase,-scal*ybase,scal*ybase])
     # --- scatter plotter for the particle worldine --- #

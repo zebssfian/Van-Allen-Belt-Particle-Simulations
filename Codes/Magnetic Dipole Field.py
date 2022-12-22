@@ -86,7 +86,7 @@ ax.w_xaxis.line.set_color((1.0, 1.0, 1.0, 0.0))
 ax.w_yaxis.line.set_color((1.0, 1.0, 1.0, 0.0))
 ax.w_zaxis.line.set_color((1.0, 1.0, 1.0, 0.0))
 
-# animation
+# --- rotating animation --- #
 '''
 res=10
 for angle in range(0, 720*res):
