@@ -140,12 +140,18 @@ eps = 0.01
 tmax = 500 # basically in seconds, given the SI units
 
 # --- test cases below --- #
+'''
+The code will run the first test case by default.
+    If you wish to try out other cases,
+    you must first comment the default test case
+    and uncomment whichever case you want to try out.
+    
+Feel free to share with us any interesting test cases of your own!
+'''
 
 #two particles with proton mass and opposite elementary charge:
-'''
 t_sav, x_sav, y_sav, z_sav = igr(tmax,eps,x0=5,y0=5,z0=5,xd0=-1,yd0=-1,zd0=-1,q=qe,m=m_p)
 t2_sav, x2_sav, y2_sav, z2_sav = igr(tmax,eps,x0=5,y0=5,z0=5,xd0=-1,yd0=-1,zd0=-1,q=-qe,m=m_p)
-'''
 
 #two protons symmetric about the z-axis:
 '''
@@ -194,8 +200,10 @@ t4_sav, x4_sav, y4_sav, z4_sav = igr(tmax,eps,x0=-50,y0=0,z0=-10,xd0=20,yd0=-1,z
 '''
 
 # electron-proton *jingle jingle* tooooo-gether again, badum badum...:
+'''
 t_sav, x_sav, y_sav, z_sav = igr(tmax,eps,x0=-6,y0=-6,z0=-6,xd0=-1,yd0=-1,zd0=-1,q=qe,m=m_p)
 t2_sav, x2_sav, y2_sav, z2_sav = igr(tmax,eps,x0=-50,y0=1,z0=-10,xd0=20,yd0=-5,zd0=1,q=-qe,m=m_e)
+'''
 
 # proton leaving the chat:
 '''
