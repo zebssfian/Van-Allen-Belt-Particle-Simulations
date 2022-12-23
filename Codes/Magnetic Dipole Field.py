@@ -4,8 +4,7 @@ import matplotlib.pyplot as plt
 # --- important note --- #
 '''
 The code will run in 3D by default.
-
-If you wish to view the Earth's magnetic field in 2D,
+    If you wish to view the Earth's magnetic field in 2D,
     you must first comment all the sections marked '3D'
     and uncomment all the sections marked '2D.'
 
