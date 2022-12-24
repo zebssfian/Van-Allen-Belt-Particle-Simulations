@@ -199,7 +199,7 @@ t3_sav, x3_sav, y3_sav, z3_sav = igr(tmax,eps,x0=50,y0=0,z0=-5,xd0=-20,yd0=-1,zd
 t4_sav, x4_sav, y4_sav, z4_sav = igr(tmax,eps,x0=-50,y0=0,z0=-10,xd0=20,yd0=-1,zd0=1,q=-qe,m=m_e)
 '''
 
-# electron-proton *jingle jingle* tooooo-gether again, badum badum...:
+# electron-proton *jingle jingle* tooooo-gether again, badum badum... (visualizing the proton and electron belts):
 '''
 t_sav, x_sav, y_sav, z_sav = igr(tmax,eps,x0=-6,y0=-6,z0=-6,xd0=-1,yd0=-1,zd0=-1,q=qe,m=m_p)
 t2_sav, x2_sav, y2_sav, z2_sav = igr(tmax,eps,x0=-50,y0=1,z0=-10,xd0=20,yd0=-5,zd0=1,q=-qe,m=m_e)
