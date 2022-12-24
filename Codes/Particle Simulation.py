@@ -232,23 +232,26 @@ t7_sav, x7_sav, y7_sav, z7_sav = igr(tmax,eps,x0=-10,y0=0,z0=-7,xd0=3,yd0=-1,zd0
 t8_sav, x8_sav, y8_sav, z8_sav = igr(tmax,eps,x0=-10,y0=0,z0=-4,xd0=4,yd0=-1,zd0=1,q=qe,m=m_p)
 '''
 
-# --- animation --- #
-v = 3 # relative animation speed (basically the number of time steps per frame)
-scal = 4 # axis scaling factor (can be changed for visuals)
-
 # base aspect ratio setting (approximately 16:9 aspect ratio)
 xbase = 100e6
 ybase = 56e6
 
-# determines the 2D slice (i.e. xy, xz planes)
-slice_2d={12:'', 1:'$x(t)$', 2:'$z(t)$'}
+scal = 4 # axis scaling factor (can be changed for visuals)
+
+# --- determines the 2D slice --- #
+'''
+The code will take the xz-slice by default.
+    If you wish to see the xy-slice,
+    simply change the second dictionary value to $y(t)$.
+'''
+slice_2d={1:'$x(t)$', 2:'$z(t)$'}
 
 # --- generates Earth's magnetic field in 2D (used as background) --- #
 def background():
     # --- 2D coordinate system --- #
     Dom = np.linspace(-scal*xbase, scal*xbase, 800)
     x, z = np.meshgrid(Dom, Dom)
-    y = 0 # the axis you set equal to zero depends on your choice of 2D slice, i.e.: (xz-slice => y=0) or (xy-slice => z=0)
+    y = 0 # the axis you set equal to zero will depend on your choice of 2D slice, i.e.: (xz-slice => y=0) or (xy-slice => z=0)
     r = np.sqrt(x**2 + y**2 + z**2)
     
     # --- magnetic field --- #
@@ -257,54 +260,52 @@ def background():
     Bz = -3 * B0 * (RE / r)**3 * (z**2 / r**2 - 1 / 3)
 
     B = np.sqrt(Bx**2 + By**2 + Bz**2) # field magnitude
+
+    # --- Earth as 2D disk --- #
+    circle = plt.Circle((0, 0), RE, color='#1f77b4',zorder=100)
     
-    # --- Fig Plotting --- #
+    # --- plotting figure --- #
     fig = plt.figure()
     ax = fig.add_subplot(1,1,1)
-    # hello darkness, my old friend #
-    plt.style.use('dark_background') # messes with overarching plt settings but it looks better this way
-    # we just want a picture since this is a background #
-    plt.axis('off')
-    # and no wonky earths please #
-    plt.gca().axis('square')
-    # !!! Earth + field (to change depending on slice) !!! #
-    plt.streamplot(x, z, Bx, Bz, color=20*np.log(B), density=2)
-    circle = plt.Circle((0, 0), RE, color='#1f77b4',zorder=100)
-    plt.gca().add_patch(circle)
-    # same limits for consistency #
-    ax.set_xlim(xmin=-scal*xbase,xmax=scal*xbase)
-    ax.set_ylim(ymin=-scal*ybase,ymax=scal*ybase)
-    plt.savefig('dark-Bfield-background.png',bbox_inches='tight',dpi=300,pad_inches=0.0)
-    plt.axis('on')  # we don't want plt to be changed forever, only here no axes
+    plt.style.use('dark_background') # hello darkness, my old friend (this minimally messes with the overarching plt settings)
+    plt.axis('off') # this is just a background
+    plt.gca().axis('square') # ensures the Earth is a perfect circle
 
-# --- run that ^ function once --- #
+    plt.streamplot(x, z, Bx, Bz, color=20*np.log(B), density=2) # these axes must be changed depending on your choice of 2D slice
+    plt.gca().add_patch(circle) # plots the Earth
+
+    # --- same limits for consistency --- #
+    ax.set_xlim(xmin=-scal*xbase, xmax=scal*xbase)
+    ax.set_ylim(ymin=-scal*ybase, ymax=scal*ybase)
+
+    # --- SAVE THE FIGURE --- #
+    # --- REMINDER: THIS WILL OVERWRITE ANY PREVIOUS VERSIONS OF 'dark_bg.png' --- #
+    plt.savefig('dark_bg', bbox_inches='tight', dpi=300, pad_inches=0.0) # saves the figure
+    
+    plt.axis('on')  # we do not want the axes gone forever
+
+# --- running the above function --- #
 background()
 
-
-# --- Animating what we just computed --- #
-i=count()                   # the animation frame counter
-fig = plt.figure()          # create (and name) a figure
-fig.patch.set_facecolor('black')
-# for dark mode: #
+fig = plt.figure()
+ax = fig.add_subplot(1,1,1)
 plt.style.use('dark_background')
-# --- create axes --- #
-ax = fig.add_subplot(1,1,1) # add and label the relevant figure subplot
-# --- get magnetic field background image, will automatically change between xz, xy, yz according to what we did above --- #
-background_field = plt.imread('dark-Bfield-background'+slice_2d[12]+'.png')
 
-# --- the animation function (creates the frames) --- #
+# --- animation --- #
+v = 3 # relative animation speed (basically the number of time steps per frame)
+i = count() # the animation frame counter
+
+background_field = plt.imread('dark_bg.png') # defines the magnetic field lines generated above as the background
+
 def animate(j):
-    # clear axes for next frame #
-    plt.cla()
-    # get the current time step #
-    t=next(i)
-    # --- set the background of the plot --- #
-    ax.imshow(background_field, extent=[-scal*xbase,scal*xbase,-scal*ybase,scal*ybase])
-    # !!! compute the time-end of the tail of the particle motion !!! #
-    tstart = ((t-25)*v if t>25 else 0)
-    # plot the particle with its tail, in full color gradient manner #
+    plt.cla() # clears axes for next frame
+    t=next(i) # gets the current time step
+    ax.imshow(background_field, extent=[-scal*xbase, scal*xbase, -scal*ybase, scal*ybase]) # sets the background of the plot
+
+    # --- plotting the particle and its tail, with a color gradient --- #
+    tstart = ((t-25)*v if t>25 else 0) # computes the time-end of the particle motion's tail
     ax.scatter(x_sav[tstart:min(t*v,int(tmax*100))],z_sav[tstart:min(t*v,int(tmax*100))],s=4,c=[(col/(t*10)) for col in range(tstart,min(t*v,int(tmax*100)))],marker='o')
-    # plot any other particles by copy pasting here #
+    # --- uncomment the next few lines depending on the number of particles you are animating --- #
     ax.scatter(x2_sav[tstart:min(t*v,int(tmax*100))],z2_sav[tstart:min(t*v,int(tmax*100))],s=4,c=[(col/(t*10)) for col in range(tstart,min(t*v,int(tmax*100)))],marker='o')
     #ax.scatter(x3_sav[tstart:min(t*v,int(tmax*100))],z3_sav[tstart:min(t*v,int(tmax*100))],s=4,c=[(col/(t*10)) for col in range(tstart,min(t*v,int(tmax*100)))],marker='o')
     #ax.scatter(x4_sav[tstart:min(t*v,int(tmax*100))],z4_sav[tstart:min(t*v,int(tmax*100))],s=4,c=[(col/(t*10)) for col in range(tstart,min(t*v,int(tmax*100)))],marker='o')
@@ -312,40 +313,44 @@ def animate(j):
     #ax.scatter(x6_sav[tstart:min(t*v,int(tmax*100))],z6_sav[tstart:min(t*v,int(tmax*100))],s=4,c=[(col/(t*10)) for col in range(tstart,min(t*v,int(tmax*100)))],marker='o')
     #ax.scatter(x7_sav[tstart:min(t*v,int(tmax*100))],z7_sav[tstart:min(t*v,int(tmax*100))],s=4,c=[(col/(t*10)) for col in range(tstart,min(t*v,int(tmax*100)))],marker='o')
     #ax.scatter(x8_sav[tstart:min(t*v,int(tmax*100))],z8_sav[tstart:min(t*v,int(tmax*100))],s=4,c=[(col/(t*10)) for col in range(tstart,min(t*v,int(tmax*100)))],marker='o')
+
+    plt.gca().axis('square') # ensures the Earth is a perfect circle
     
-    # !!! change this ^ and the labels below for different slices !!! #
-    # label your axes, of course, because we all forget sometimes #
-    ax.set_xlabel(slice_2d[1]+str(' at $t = %.2f$' % t_sav[min(t*v,int(tmax*100))])+str(' s')) # note that t is relative, for demonstration purposes of the animation and keeping track of frame count
+    # --- label your axes, of course, because we all forget sometimes --- #
+    ax.set_xlabel(slice_2d[1] + str(' at $t = %.2f$' % t_sav[min(t*v, int(tmax*100))]) + str(' s')) # note that t is relative, it is used for demonstrational purposes and to keep track of frame count
     ax.set_ylabel(slice_2d[2])
-    # and no wonky earths please #
-    plt.gca().axis('square')
-    # axis limits for consistency #
+    
+    # --- same limits for consistency --- #
     ax.set_xlim(xmin=-scal*xbase,xmax=scal*xbase)
     ax.set_ylim(ymin=-scal*ybase,ymax=scal*ybase)
 
-# --- perform the animation using the above function and figure --- #
-animation_1 = animation.FuncAnimation(fig,animate,frames=2000,interval=33)
+# --- animation function --- #
+ani = animation.FuncAnimation(fig, animate, frames=2000, interval=33)
 plt.show()
-# !!! save the animation !!! #
-animation_1.save("particle_motion-proton-electron-together-xz(timed).mp4",dpi=300)
 
+# --- SAVE THE ANIMATION --- #
+# --- REMINDER: THIS WILL OVERWRITE ANY PREVIOUS ANIMATIONS OF THE SAME NAME --- #
+ani.save("test_case_1.mp4",dpi=300)
 
-# trace plotting for the full motion #
+# --- plot the entire particle trajectories (can be called from the command line) --- #
+'''
 def plotFullTrace(u,v,t):
-    # --- Fig Plotting --- #
     fig = plt.figure()
-    plt.style.use('dark_background')
     ax = fig.add_subplot(1,1,1)
-    # --- get magnetic field background image, to change between xz, xy, yz --- #
-    background_field = plt.imread('dark-Bfield-background'+slice_2d[12]+'.png')
-    # --- set the background of the plot --- #
-    ax.imshow(background_field, extent=[-scal*xbase,scal*xbase,-scal*ybase,scal*ybase])
-    # --- scatter plotter for the particle worldine --- #
+    plt.style.use('dark_background')
+    
+    background_field = plt.imread('dark_bg.png') # defines the magnetic field lines generated above as the background
+    ax.imshow(background_field, extent=[-scal*xbase, scal*xbase, -scal*ybase, scal*ybase]) # sets the background of the plot
+
+    # --- scatter plotter for the particle's worldine --- #
     ax.scatter(u,v,s=4,c=[(col/len(t)) for col in range(len(t))],marker='o')
-    # consistent axis labelling #
+    
+    # --- axes labelling --- #
     ax.set_xlabel(slice_2d[1])
     ax.set_ylabel(slice_2d[2])
     plt.gca().axis('square')
-    # axis limits for consistency #
+    
+    # --- same limits for consistency --- #
     ax.set_xlim(xmin=-scal*xbase,xmax=scal*xbase)
     ax.set_ylim(ymin=-scal*ybase,ymax=scal*ybase)
+'''
