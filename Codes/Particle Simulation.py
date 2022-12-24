@@ -141,12 +141,17 @@ tmax = 500 # basically in seconds, given the SI units
 
 # --- test cases below --- #
 '''
-The code will run the first test case by default.
+The code will run the second test case by default.
     If you wish to try out other cases,
     you must first comment the default test case
     and uncomment whichever case you want to try out.
     
 Feel free to share with us any interesting test cases of your own!
+'''
+
+#single proton motion:
+'''
+t_sav, x_sav, y_sav, z_sav = igr(tmax,eps,x0=5,y0=5,z0=5,xd0=1,yd0=1,zd0=1,q=qe,m=m_p)
 '''
 
 #two particles with proton mass and opposite elementary charge:
@@ -213,11 +218,6 @@ t_sav, x_sav, y_sav, z_sav = igr(tmax,eps,x0=-5,y0=-5,z0=-5,xd0=5,yd0=5,zd0=5,q=
 #proton leaving the chat but more slowly:
 '''
 t_sav, x_sav, y_sav, z_sav = igr(tmax,eps,x0=-10,y0=-10,z0=-10,xd0=2,yd0=2,zd0=2,q=qe,m=m_p)
-'''
-
-#single proton staying:
-'''
-t_sav, x_sav, y_sav, z_sav = igr(tmax,eps,x0=5,y0=5,z0=5,xd0=1,yd0=1,zd0=1,q=qe,m=m_p)
 '''
 
 # string octet:
