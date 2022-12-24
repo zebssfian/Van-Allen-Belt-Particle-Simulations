@@ -13,7 +13,7 @@ The animation style is relatively original and can be reused for other kinds of 
 
 ## Documentation
 
-Yeah, one day.
+Here it is: [Documentation](https://github.com/zebssfian/Van-Allen-Belt-Particle-Simulations/blob/main/Documentation.pdf)
 
 ## License
 
