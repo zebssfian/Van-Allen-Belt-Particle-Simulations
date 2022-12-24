@@ -35,13 +35,13 @@ Bz = -3 * B0 * (RE / r)**3 * (z**2 / r**2 - 1 / 3)
 
 B = np.sqrt(Bx**2 + By**2 + Bz**2) # field magnitude
 
-# --- Earth as a 3D Ball --- #
+# --- Earth as a 3D ball --- #
 u, v = np.mgrid[0:2*np.pi:200j, 0:np.pi:100j]
 X = RE*np.cos(u)*np.sin(v)
 Y = RE*np.sin(u)*np.sin(v)
 Z = RE*np.cos(v)
 
-# --- Earth as 2D Disk --- #
+# --- Earth as 2D disk --- #
 '''
 circle = plt.Circle((0, 0), RE, color='b',zorder=100)
 '''
