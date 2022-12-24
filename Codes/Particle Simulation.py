@@ -233,36 +233,30 @@ t8_sav, x8_sav, y8_sav, z8_sav = igr(tmax,eps,x0=-10,y0=0,z0=-4,xd0=4,yd0=-1,zd0
 '''
 
 # --- animation --- #
-v =3 # relative animation speed (basically the number of time steps per frame)
-scal=4 # axis scaling factor (can be changed for visuals)
+v = 3 # relative animation speed (basically the number of time steps per frame)
+scal = 4 # axis scaling factor (can be changed for visuals)
 
-# base aspect ratio setting
-xbase=100e6
-ybase=56e6
+# base aspect ratio setting (approximately 16:9 aspect ratio)
+xbase = 100e6
+ybase = 56e6
 
-# !!! determines the 2D slice (i.e. xy, xz planes) !!!
-slicee={
-        12:'',
-        1:'$x(t)$',
-        2:'$z(t)$',
-        }
+# determines the 2D slice (i.e. xy, xz planes)
+slice_2d={12:'', 1:'$x(t)$', 2:'$z(t)$'}
 
-# --- Create background field line plot according to scale --- #
-def makeBack():
-    # --- 2D Coordinate System --- #
-    Dom = np.linspace(-scal*xbase,scal*xbase,800)
-    # !!! need to change which axis set to 0 depending on slice !!! #
+# --- generates Earth's magnetic field in 2D (used as background) --- #
+def background():
+    # --- 2D coordinate system --- #
+    Dom = np.linspace(-scal*xbase, scal*xbase, 800)
     x, z = np.meshgrid(Dom, Dom)
-    # technically problematic at z/y=0 but it's fine #
-    y = 0
+    y = 0 # the axis you set equal to zero depends on your choice of 2D slice, i.e.: (xz-slice => y=0) or (xy-slice => z=0)
     r = np.sqrt(x**2 + y**2 + z**2)
     
-    # --- Magnetic Field Components --- #
-    Bx = -3 * B0 * (RE / r)**3 * x*z/r**2
-    By = -3 * B0 * (RE / r)**3 * y*z/r**2
-    Bz = B0 * (RE / r)**3 * (x**2+y**2-2*z**2) / r**2
-    # field magnitude #
-    B = np.sqrt(Bx**2 + Bz**2 + By**2)
+    # --- magnetic field --- #
+    Bx = -3 * B0 * (RE / r)**3 * x*z / r**2
+    By = -3 * B0 * (RE / r)**3 * y*z / r**2
+    Bz = -3 * B0 * (RE / r)**3 * (z**2 / r**2 - 1 / 3)
+
+    B = np.sqrt(Bx**2 + Bz**2 + By**2) # field magnitude
     
     # --- Fig Plotting --- #
     fig = plt.figure()
@@ -280,11 +274,11 @@ def makeBack():
     # same limits for consistency #
     ax.set_xlim(xmin=-scal*xbase,xmax=scal*xbase)
     ax.set_ylim(ymin=-scal*ybase,ymax=scal*ybase)
-    plt.savefig('C:\\Users\\???\\OneDrive - McGill University\\Assignments\\Fall 2022\\Phys 350\\Project\\dark-Bfield-background.png',bbox_inches='tight',dpi=300,pad_inches=0.0)
+    plt.savefig('dark-Bfield-background.png',bbox_inches='tight',dpi=300,pad_inches=0.0)
     plt.axis('on')  # we don't want plt to be changed forever, only here no axes
 
 # --- run that ^ function once --- #
-makeBack()
+background()
 
 
 # --- Animating what we just computed --- #
@@ -296,7 +290,7 @@ plt.style.use('dark_background')
 # --- create axes --- #
 ax = fig.add_subplot(1,1,1) # add and label the relevant figure subplot
 # --- get magnetic field background image, will automatically change between xz, xy, yz according to what we did above --- #
-background_field = plt.imread('C:\\Users\\???\\OneDrive - McGill University\\Assignments\\Fall 2022\\Phys 350\\Project\\dark-Bfield-background'+slicee[12]+'.png')
+background_field = plt.imread('dark-Bfield-background'+slice_2d[12]+'.png')
 
 # --- the animation function (creates the frames) --- #
 def animate(j):
@@ -321,8 +315,8 @@ def animate(j):
     
     # !!! change this ^ and the labels below for different slices !!! #
     # label your axes, of course, because we all forget sometimes #
-    ax.set_xlabel(slicee[1]+str(' at $t = %.2f$' % t_sav[min(t*v,int(tmax*100))])+str(' s')) # note that t is relative, for demonstration purposes of the animation and keeping track of frame count
-    ax.set_ylabel(slicee[2])
+    ax.set_xlabel(slice_2d[1]+str(' at $t = %.2f$' % t_sav[min(t*v,int(tmax*100))])+str(' s')) # note that t is relative, for demonstration purposes of the animation and keeping track of frame count
+    ax.set_ylabel(slice_2d[2])
     # and no wonky earths please #
     plt.gca().axis('square')
     # axis limits for consistency #
@@ -333,7 +327,7 @@ def animate(j):
 animation_1 = animation.FuncAnimation(fig,animate,frames=2000,interval=33)
 plt.show()
 # !!! save the animation !!! #
-animation_1.save("C:\\Users\\???\\OneDrive - McGill University\\Assignments\\Fall 2022\\Phys 350\\Project\\animation gifs\\particle_motion-proton-electron-together-xz(timed).mp4",dpi=300)
+animation_1.save("particle_motion-proton-electron-together-xz(timed).mp4",dpi=300)
 
 
 # trace plotting for the full motion #
@@ -343,14 +337,14 @@ def plotFullTrace(u,v,t):
     plt.style.use('dark_background')
     ax = fig.add_subplot(1,1,1)
     # --- get magnetic field background image, to change between xz, xy, yz --- #
-    background_field = plt.imread('C:\\Users\\???\\OneDrive - McGill University\\Assignments\\Fall 2022\\Phys 350\\Project\\dark-Bfield-background'+slicee[12]+'.png')
+    background_field = plt.imread('dark-Bfield-background'+slice_2d[12]+'.png')
     # --- set the background of the plot --- #
     ax.imshow(background_field, extent=[-scal*xbase,scal*xbase,-scal*ybase,scal*ybase])
     # --- scatter plotter for the particle worldine --- #
     ax.scatter(u,v,s=4,c=[(col/len(t)) for col in range(len(t))],marker='o')
     # consistent axis labelling #
-    ax.set_xlabel(slicee[1])
-    ax.set_ylabel(slicee[2])
+    ax.set_xlabel(slice_2d[1])
+    ax.set_ylabel(slice_2d[2])
     plt.gca().axis('square')
     # axis limits for consistency #
     ax.set_xlim(xmin=-scal*xbase,xmax=scal*xbase)
