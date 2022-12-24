@@ -256,7 +256,7 @@ def background():
     By = -3 * B0 * (RE / r)**3 * y*z / r**2
     Bz = -3 * B0 * (RE / r)**3 * (z**2 / r**2 - 1 / 3)
 
-    B = np.sqrt(Bx**2 + Bz**2 + By**2) # field magnitude
+    B = np.sqrt(Bx**2 + By**2 + Bz**2) # field magnitude
     
     # --- Fig Plotting --- #
     fig = plt.figure()
