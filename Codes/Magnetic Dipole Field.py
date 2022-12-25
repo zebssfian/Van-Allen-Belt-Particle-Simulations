@@ -97,7 +97,7 @@ for angle in range(0, 720*res):
 
 # --- plotting in 2D --- #
 '''
-fig = plt.figure(figsize = (12, 6))
+fig = plt.figure(figsize = (16, 9))
 plt.style.use('dark_background')
 
 plt.streamplot(x, z, Bx, Bz, color=20*np.log(B), density=2)
