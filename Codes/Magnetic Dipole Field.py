@@ -5,28 +5,22 @@ import matplotlib.pyplot as plt
 '''
 The code will run in 3D by default.
     If you wish to view the Earth's magnetic field in 2D,
-    you must first comment all the sections marked '3D'
-    and uncomment all the sections marked '2D.'
+    you must first comment the section marked '3D'
+    and uncomment the section marked '2D.'
 
 Have fun!
 '''
+
+# --- 3D --- #
 
 # --- constants --- #
 B0 = 3.12e-5 # Tesla (mean value of the magnetic field at the magnetic equator on the Earth's surface)
 RE = 6.278 # e6 meters (radius of the Earth)
 
-# --- 3D coordinate system --- #
+# --- coordinate system --- #
 Dom = np.linspace(-100,100,10)
 x, y, z = np.meshgrid(Dom, Dom, Dom)
 r = np.sqrt(x**2 + y**2 + z**2)
-
-# --- 2D coordinate system --- #
-'''
-Dom = np.linspace(-100,100,100)
-x, z = np.meshgrid(Dom, Dom)
-y = 0
-r = np.sqrt(x**2 + y**2 + z**2)
-'''
 
 # --- magnetic field --- #
 Bx = -3 * B0 * (RE / r)**3 * x*z / r**2
@@ -41,12 +35,7 @@ X = RE*np.cos(u)*np.sin(v)
 Y = RE*np.sin(u)*np.sin(v)
 Z = RE*np.cos(v)
 
-# --- Earth as 2D disk --- #
-'''
-circle = plt.Circle((0, 0), RE, color='b',zorder=100)
-'''
-
-# --- plotting in 3D --- #
+# --- plotting --- #
 ax = plt.figure().add_subplot(projection='3d')
 
 ax.plot_surface(X, Y, Z, color='b')
@@ -95,9 +84,32 @@ for angle in range(0, 720*res):
     plt.pause(0.001)
 '''
 
-# --- plotting in 2D --- #
+plt.show()
+
+# --- 2D --- #
 '''
-fig = plt.figure(figsize = (12, 6))
+# --- constants --- #
+B0 = 3.12e-5 # Tesla (mean value of the magnetic field at the magnetic equator on the Earth's surface)
+RE = 6.278 # e6 meters (radius of the Earth)
+
+# --- coordinate system --- #
+Dom = np.linspace(-100,100,100)
+x, z = np.meshgrid(Dom, Dom)
+y = 0
+r = np.sqrt(x**2 + y**2 + z**2)
+
+# --- magnetic field --- #
+Bx = -3 * B0 * (RE / r)**3 * x*z / r**2
+By = -3 * B0 * (RE / r)**3 * y*z / r**2
+Bz = -3 * B0 * (RE / r)**3 * (z**2 / r**2 - 1 / 3)
+
+B = np.sqrt(Bx**2 + By**2 + Bz**2) # field magnitude
+
+# --- Earth as 2D disk --- #
+circle = plt.Circle((0, 0), RE,zorder=100)
+
+# --- plotting --- #
+fig = plt.figure(figsize = (16, 9))
 plt.style.use('dark_background')
 
 plt.streamplot(x, z, Bx, Bz, color=20*np.log(B), density=2)
@@ -106,6 +118,6 @@ plt.gca().add_patch(circle)
 plt.axis('square')
 plt.xlabel('x-axis')
 plt.ylabel('z-axis')
-'''
 
 plt.show()
+'''
