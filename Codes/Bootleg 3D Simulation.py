@@ -161,6 +161,7 @@ ybase = 56e6
 
 scal = 4 # axis scaling factor (can be changed for visuals)
 
+# plots motion in 3D (idk how to make the cmap viridis)
 plt.plot(x_sav, y_sav, z_sav, color="orange")
 
 plt.show()
