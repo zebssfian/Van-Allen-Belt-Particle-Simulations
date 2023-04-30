@@ -150,13 +150,13 @@ Feel free to share with us any interesting test cases of your own!
 '''
 
 #single proton motion:
-'''
 t_sav, x_sav, y_sav, z_sav = igr(tmax,eps,x0=5,y0=5,z0=5,xd0=1,yd0=1,zd0=1,q=qe,m=m_p)
-'''
 
 #two particles with proton mass and opposite elementary charge:
+'''
 t_sav, x_sav, y_sav, z_sav = igr(tmax,eps,x0=5,y0=5,z0=5,xd0=-1,yd0=-1,zd0=-1,q=qe,m=m_p)
 t2_sav, x2_sav, y2_sav, z2_sav = igr(tmax,eps,x0=5,y0=5,z0=5,xd0=-1,yd0=-1,zd0=-1,q=-qe,m=m_p)
+'''
 
 #two protons symmetric about the z-axis:
 '''
@@ -306,7 +306,7 @@ def animate(j):
     tstart = ((t-25)*v if t>25 else 0) # computes the time-end of the particle motion's tail
     ax.scatter(x_sav[tstart:min(t*v,int(tmax*100))],z_sav[tstart:min(t*v,int(tmax*100))],s=4,c=[(col/(t*10)) for col in range(tstart,min(t*v,int(tmax*100)))],marker='o')
     # --- uncomment the next few lines depending on the number of particles you are animating --- #
-    ax.scatter(x2_sav[tstart:min(t*v,int(tmax*100))],z2_sav[tstart:min(t*v,int(tmax*100))],s=4,c=[(col/(t*10)) for col in range(tstart,min(t*v,int(tmax*100)))],marker='o')
+    # ax.scatter(x2_sav[tstart:min(t*v,int(tmax*100))],z2_sav[tstart:min(t*v,int(tmax*100))],s=4,c=[(col/(t*10)) for col in range(tstart,min(t*v,int(tmax*100)))],marker='o')
     #ax.scatter(x3_sav[tstart:min(t*v,int(tmax*100))],z3_sav[tstart:min(t*v,int(tmax*100))],s=4,c=[(col/(t*10)) for col in range(tstart,min(t*v,int(tmax*100)))],marker='o')
     #ax.scatter(x4_sav[tstart:min(t*v,int(tmax*100))],z4_sav[tstart:min(t*v,int(tmax*100))],s=4,c=[(col/(t*10)) for col in range(tstart,min(t*v,int(tmax*100)))],marker='o')
     #ax.scatter(x5_sav[tstart:min(t*v,int(tmax*100))],z5_sav[tstart:min(t*v,int(tmax*100))],s=4,c=[(col/(t*10)) for col in range(tstart,min(t*v,int(tmax*100)))],marker='o')
