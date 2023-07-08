@@ -6,7 +6,7 @@ This project was motivated by an E&M video project on the topic, which can be vi
 
 The animation style is relatively original and can be reused for other kinds of particle simulations if desired.
 
-![](https://github.com/zebssfian/Van-Allen-Belt-Particle-Simulations/thumbnail.png)
+![](https://github.com/zebssfian/Van-Allen-Belt-Particle-Simulations/blob/main/Thumbnail.png)
 
 ## Authors
 
