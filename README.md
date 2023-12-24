@@ -6,7 +6,11 @@ This coding project was motivated by an E&M video project on the topic, which ca
 
 The animation style is inspired by 3Blue1Brown and can be reused for other kinds of particle simulations if desired.
 
+## Preview
+
 ![](https://github.com/zebssfian/Van-Allen-Belt-Particle-Simulations/blob/main/Thumbnail.png)
+
+The Earth is modelled as a blue sphere in the center of the picture, and its magnetic field is represented by the blue arrows.
 
 ## Authors
 
