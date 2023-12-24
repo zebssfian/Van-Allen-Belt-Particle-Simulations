@@ -10,7 +10,7 @@ The animation style is inspired by 3Blue1Brown and can be reused for other kinds
 
 ![](https://github.com/zebssfian/Van-Allen-Belt-Particle-Simulations/blob/main/Thumbnail.png)
 
-The Earth is modelled as a blue sphere in the center of the picture, and its magnetic field is represented by the blue arrows.
+The Earth is modelled as a blue sphere in the center of the picture, and its magnetic field is represented by the blue arrows. The violet-blue-green-yellow trajectory traces the path of an electron-like particle through the magnetic field, with the colour gradient representing the trail.
 
 ## Authors
 
