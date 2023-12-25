@@ -12,7 +12,7 @@ The animation style is inspired by 3Blue1Brown and can be reused for other kinds
 
 The Earth is modeled as a blue sphere located at the center while the blue arrows surrounding it represent the magnetic field lines. A multi-coloured line, evolving from dark violet to light yellow, traces the path of an electron-like particle through the magnetic field. The colour gradient along this trajectory marks the passage of time, with the darker shades indicating the particle's earlier positions and the brighter shades indicating more recent ones.
 
-![](https://github.com/zebssfian/Van-Allen-Belt-Particle-Simulations/blob/main/Animations/proton%20and%20electron%20belts%20(xz-plane).mp4)
+More impressive animations can be viewed in the Animations folder.
 
 ## Authors
 
